@@ -144,24 +144,151 @@ class color_data
  * |  Class definition for Line
  * ==================================================================
  */
+class Line
+{
+  public:
+	  Vector loc, dir;
+	  int flag;
+};
 
 
 /* ==================================================================
  * |  Class definition for Lamp
  * ==================================================================
  */
-
+class Lamp
+{
+  public:
+	  Vector loc;
+	  float radius, distance;
+	  Lamp * next_lamp;
+};
 
 /* ==================================================================
  * |  Class definition for a Pattern
  * ==================================================================
  */
-
+class Pattern
+{
+  public:
+	  short type;		// type of pattern
+	  float xsize,		// pattern size in x direction
+		ysize,		// pattern size in y direction
+		startx,		//x coordinate starting position
+		starty,		//y coordinate starting position
+		endx,		//x coordinate ending position
+		endy,		//y coordinate ending position
+		radius;		// radius of circle pattern
+	 color_data col_data;	// color information
+	 char name[32];		// name of pattern
+	 Pattern *child,
+		 *sibling,
+		 *link;
+};
 
 /* ==================================================================
  * |  Class definition for Object
  * ==================================================================
  */
+class Object
+{
+	public:
+		unsigned char type,	// object type
+			      flag;
+		char name[16];		// object name
+		Vector loc,		// object location
+		       vect1,		// 3 vectors
+		       vect2,
+		       vect3,
+		       lower,		//lower bound
+		       upper,		//upper bound
+		       norm;
+		float cterm,		//used for quadratic surfaces only
+		      xmult,		//x multiplier for patterns	      
+		      ymult,		//y multiplier for pattern
+		      nl,		// precomputed values
+		      len1,
+		      len2,
+		      cos1,
+		      sin1,
+		      cos2,
+		      sin2;
+		color_data	*col_data;	// color information
+		Object		*nextobj,	//address of next object in
+						//list				
+				*child;		// address of child for
+						//bounding boxes
+		Pattern 	*pattern,	//addr of pattern structure
+				*remove;	//address of struct to remove
+
+		// object section
+		Object operator=(Object &);
+		virtual void FindNorm(Vector * normal, Vector * position);
+		virtual void Position (float * pos1, float *pos2,
+				Vector *location);
+		virtual int CollisionTest(Line * line, float *t);
+		virtual void FindBbox(Vector * v1, Vector * v2);		
+		virtual void Scale_Instance(Vector *mult, int fflag);
+};
+
+class Sphere: public Object
+{
+  public:
+	  Sphere();
+	  void FindNorm(Vector * normal, Vector * position);
+	  void Position (float * pos1, float *pos2, Vector *location);
+	  int CollisionTest(Line * line, float *t);
+	  void FindBbox(Vector * v1, Vector *v2);
+	  void Scale_Instance(Vector *mult, int fflag);
+};
+
+class Triangle: public Object
+{
+  public:
+	  Triangle();
+	  void FindNorm(Vector * normal, Vector * position);
+	  void Position (float * pos1, float *pos2, Vector *location);
+	  int CollisionTest(Line * line, float *t);
+	  void FindBbox(Vector * v1, Vector *v2);
+	  void Scale_Instance(Vector *mult, int fflag);
+
+};
+
+class Parallelogram: public Object
+{
+  public:
+	  Parallelogram();
+	  void FindNorm(Vector * normal, Vector * position);
+	  void Position (float * pos1, float *pos2, Vector *location);
+	  int CollisionTest(Line * line, float *t);
+	  void FindBbox(Vector * v1, Vector *v2);
+	  void Scale_Instance(Vector *mult, int fflag);
+
+};
+
+class Ring: public Object
+{
+  public:
+	  Ring();
+	  void FindNorm(Vector * normal, Vector * position);
+	  void Position (float * pos1, float *pos2, Vector *location);
+	  int CollisionTest(Line * line, float *t);
+	  void FindBbox(Vector * v1, Vector *v2);
+	  void Scale_Instance(Vector *mult, int fflag);
+
+};
+
+class Quadratic: public Object
+{
+	public:
+		Quadratic();
+	  void FindNorm(Vector * normal, Vector * position);
+	  void Position (float * pos1, float *pos2, Vector *location);
+	  int CollisionTest(Line * line, float *t);
+	  void FindBbox(Vector * v1, Vector *v2);
+	  void Scale_Instance(Vector *mult, int fflag);
+
+};
 
 
 /* ==================================================================
