@@ -290,12 +290,59 @@ class Quadratic: public Object
 
 };
 
+class BBox : public Object
+{
+ int CollisionTest(Line * line, float *t);
+ void FindBbox(Vector * v1, Vector * v2);
+};
 
 /* ==================================================================
  * |  Structure for the World
  * ==================================================================
  */
 
+typedef struct world
+{
+  Object * stack,		// list of objects in picture
+
+	 * instances;		// list of user defined primitives
+  
+  Lamp * lamps;	
+  Line * line;
+  int objcount,			// number of objects
+      lampcount,		// number of lamps
+      first_scan,		//first scan line
+      last_scan;		// last scan line
+  long ray_intersects,		// statistics
+       primary_traced,
+       to_lamp,
+       refl_trans,
+       bbox_intersects,
+       intersect_tests,
+       pixels_hit,
+       pattern_matches;
+  Vector  obsright,		// observer right direction
+	  obsup,		// obs up direction
+	  obsloc,		// location of observer
+	  obsdir,		// direction in which observer looks
+
+	  skycolor_horiz,	// sky color at horizon
+	  skycolor_zenith;	// sky color at zenith
+  float sky_dither;
+  Pattern * patlist;		// list of pattern addresses
+  float flength,		// focal length
+	globindex;		// gloabl index of refraction
+
+  char outfile[32];		// output file name
+  FILE *filept;			//output file pointer
+  float threshold;
+  float int_threshold,
+	fractal_dim,
+	fractal_scalar;
+  int level;
+
+}
+World;
 
 /* ==================================================================
  * |  Math definitions
@@ -312,17 +359,36 @@ class Quadratic: public Object
  * ==================================================================
  */
 
+typedef struct def_struct
+{
+  color_data col_data;	// default colorinfo
+  short shadow;		// compute shadows ?
+  float threshold;	// cutoff point for min refl, refl rays
+
+  short ithreshold;	// integer version of above
+}
+DEF;
+
 
 /* ==================================================================
  * |  Setup of Variables
  * ==================================================================
  */
 
+extern World WORLD;		// the world of objects in the scene
+extern DEF def;			// default values for some parameters
+extern int linenumber;		// line counter
 
 /* ==================================================================
  * |  Function Prototypes for RENDER.C
  * ==================================================================
  */
+void init_world(void);
+void init_color(void);
+void World_Stats(void);
+void Open_File();
+void Close_File();
+void scanner(Object * test);
 
 
 /* ==================================================================
@@ -330,6 +396,32 @@ class Quadratic: public Object
  * ==================================================================
  */
 
+Pattern *Attach_Pattern;
+int GetAttrib(int type, char string_buf[]);
+Pattern *Get_Circle_Pattern();
+int get_color_data(int type, color_data *col_data);
+Object * get_data();
+int GetLamp();
+int LoadWorld();
+Object * Get_Object(int type, Object *queue);
+Object * GetParallelogram();
+int GetPattern();
+Pattern *Get_Poly_Pattern();
+Pattern *Get_Rect_Pattern();
+Object * GetRing();
+Object * GetSphere();
+int get_string(char string_buf[]);
+Pattern *Get_SubPattern(int type);
+Object * GetTriangle();
+Object * GetQuadratic();
+void Make_Bbox(Object *mode);
+Object * Name_Find(Object * obj, char *name);
+Object * Move_Instance(Object * obj, int fflag);
+void Offset_Instance(Object * obj, Vector * offset, int fflag);
+Object * Get_Instance_Of();
+void Fractal_comp(Triangle * newobj);
+Object * Make_fractal_triangles(Vector loc, Vector vect1, Vector vect2,
+		Vector vect3, Object * queue, int level);
 
 /* ==================================================================
  * |  Function Prototypes for RAY.C
