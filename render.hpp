@@ -428,4 +428,22 @@ Object * Make_fractal_triangles(Vector loc, Vector vect1, Vector vect2,
  * ==================================================================
  */
 
+void Trace_Scene();
+void DiffuseColor(Vector * color, color_data * col_data, Vector * norm,
+		Vector * loc, Line * oline);
+void Dump_Line(int lineno, char r[], char g[], char b[]);
+void AmbientColor(Vector * color, color_data * col_data, Vector * norm,
+		Vector * loc);
+void TransparentColor(Vector * color, color_data * col_data, Vector * norm,
+		Vector * loc, Line * line, float inmult);
+void ReflectColor(Vector * color, color_data * col_data, Vector * norm,
+		Vector * loc, Line * line, float inmult);
+void SkyColor(Vector * color, float dither);
+void Dither(Vector * color, float dither);
+void Dither(Vector * color, color_data * col_data);
+Object * Intersect(Object * CurrObj, Line * line, float * shortest_time,
+		short shadow_flag, short init_flag, Vector * atten);
+int Trace_Ray(Line * line, Vector * color, float multiplier);
+int Find_Color(Object * obj, Pattern *pattern, Vector * location,
+		color_data *c_data, float x_mult, float y_mult);
 
